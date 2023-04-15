@@ -1,8 +1,5 @@
 { pkgs ? import <nixpkgs> {} }:
 
-let
-  nodejs = pkgs.nodejs-19_x;
-in
 pkgs.mkShell {
   buildInputs = [
     pkgs.nodejs-19_x
@@ -15,7 +12,6 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
-    export PATH="$PATH:${nodejs}/bin"
     export GANACHE_PORT=7545
     export GANACHE_DB_PATH=./tmp/ganache_data
     export GANACHE_MNEMONIC="diesel sunset host claim much rack hurdle want obscure slab auto member"
@@ -24,7 +20,7 @@ pkgs.mkShell {
     mkdir -p "$GANACHE_DB_PATH"
 
     ganache_start() {
-      ganache-cli --port="$GANACHE_PORT" --db="$GANACHE_DB_PATH" --mnemonic="$GANACHE_MNEMONIC" --networkId="$GANACHE_NETWORK_ID"
+      npm exec ganache --port="$GANACHE_PORT" --db="$GANACHE_DB_PATH" --mnemonic="$GANACHE_MNEMONIC" --networkId="$GANACHE_NETWORK_ID"
     }
   '';
 }
