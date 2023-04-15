@@ -7,12 +7,18 @@ This cookbook will teach you how to deploy to a local chain (ganache) by using D
 - orbstack
 
 # Directly use this project to play around
+## Bootstrapping
 - Run the shell directly, Docker will help you build the essential images and run necessary containers
   ```
   docker-compose run --rm deployment-playground
   ```
 
 > All the following commands are on the shell of the `deployment-playground` docker container
+- Install neccessary packages
+  ```shell
+  npm install
+  ```
+## Commands
 - Run tests
   ```shell
   npm exec truffle test
@@ -21,7 +27,10 @@ This cookbook will teach you how to deploy to a local chain (ganache) by using D
   ```shell
   npm exec truffle migrate
   ```
-
+- Truffle Console
+  ```shell
+  npm exec truffle console
+  ```
 - Compile smart contracts
   ```shell
   npm exec truffle compile
