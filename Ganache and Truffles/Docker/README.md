@@ -1,10 +1,9 @@
 # Introduction
 This cookbook will teach you how to deploy to a local chain (ganache) by using Docker files.
 
-# Installation
-- install docker
-- install docker-compose
-- orbstack
+# Pre-Installation
+- Install [Docker & docker-compose](https://docs.docker.com/compose/install/)
+- (Optional) [Orbstack](https://orbstack.dev/): to have better performance for running Docker
 
 # Directly use this project to play around
 ## Bootstrapping
