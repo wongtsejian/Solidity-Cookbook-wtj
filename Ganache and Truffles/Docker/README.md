@@ -9,7 +9,7 @@ This cookbook will teach you how to deploy to a local chain (ganache) by using D
 # Directly use this project to play around
 ## Bootstrapping
 - Run the shell directly, Docker will help you build the essential images and run necessary containers
-  ```
+  ```shell
   docker-compose run --rm deployment-playground
   ```
 
@@ -119,8 +119,6 @@ This cookbook will teach you how to deploy to a local chain (ganache) by using D
 
 ## Testing
 > All the following commands are on the shell of the `deployment-playground` docker container
-
-> Reference:
 
 - Create test file
   ```shell
