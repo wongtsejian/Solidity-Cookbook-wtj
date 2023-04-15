@@ -69,6 +69,15 @@ This cookbook will teach you how to deploy to a local chain (ganache) by using D
   },
   ```
 
+- (Alternatives) Ganache GUI
+  ```js
+  development: {
+    host: "host.docker.internal", // Docker to connect to the original local network
+    port: 7546, // refers to what you have setup on GUI
+    network_id: "5777", // refers to what you have setup on GUI
+  }
+  ```
+
 ## Contract development
 > All the following commands are on the shell of the `deployment-playground` docker container
 - Create a contract file
