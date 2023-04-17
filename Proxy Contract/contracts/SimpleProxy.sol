@@ -26,22 +26,18 @@ library StorageSlot {
 // For production use case, consider using ERC1967Proxy, TransparentUpgradeableProxy
 contract SimpleProxy is Proxy {
 
-  address public Implementation;
   address owner; 
-   bytes32 private constant _IMPL_SLOT =
-        bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1);
+  bytes32 private constant _IMPL_SLOT =
+      bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1);
 
   constructor() {
     owner = msg.sender;
-    console.log("SimpleProxy Constructor owner: %s, Implementation: %s", owner, Implementation);
   }
 
   /**
     * @dev Override parent function to specify
     */
   function _implementation() internal view override returns (address) {
-    // console.log(" _implementation: %s", Implementation);
-    // return Implementation;
     return StorageSlot.getAddressAt(_IMPL_SLOT);
   }
 
@@ -51,14 +47,7 @@ contract SimpleProxy is Proxy {
 
   function setImplementation(address _address) public  {
     require(msg.sender == owner, "Invalid Owner");
-    // console.log(" setImplementation: %s, address: %s", Implementation, _address);
-    Implementation = _address ; 
     StorageSlot.setAddressAt(_IMPL_SLOT, _address);
-    // console.log(" Implementation: %s set to address: %s", Implementation, _address);
   }
 
-
-//  function _beforeFallback() internal virtual override {
-//   console.log("before fallback: implementation: ", Implementation);
-//  }
 }
