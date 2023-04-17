@@ -13,4 +13,6 @@ A proxy smart contract works by delegating calls to another contract known as th
 
 When a user interacts with the proxy contract, the proxy contract simply forwards the call to the implementation contract. The implementation contract executes the logic and returns the result to the proxy contract, which then returns the result to the user.
 
-Read more here: https://medium.com/coinmonks/proxy-pattern-and-upgradeable-smart-contracts-45d68d6f15da 
+Read more here: 
+- https://medium.com/coinmonks/proxy-pattern-and-upgradeable-smart-contracts-45d68d6f15da 
+- https://eips.ethereum.org/EIPS/eip-1967
