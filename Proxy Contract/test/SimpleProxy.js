@@ -25,64 +25,46 @@ describe("SimpleProxy", async function () {
     });
 
     it("Testing Simple Proxy call", async () => {
-        await proxy.setImplementation(logic.address);
         const Implementation = await ethers.getContractFactory("ProxyImplementation");
         const proxyContract = await Implementation.attach(
             proxy.address // The deployed contract address
         );
 
-        // sets storage vars in logic contract.
-        // await logic.setNumber(30); 
-        // console.log("Base: ", (await logic.getNumber()).toString());
-        // expect(await logic.getNumber()).to.eq(30);
-        console.log("1");
+        // Set Proxy Storage Location
         await proxyContract.setNumber(20);
-        console.log("proxyContract Implementation: ", await proxy.getImplementation());
+        expect (await proxyContract.getNumber()).to.eq(20);
+        await proxyContract.setNumber(30);
+        expect (await proxyContract.getNumber()).to.eq(30);
         
-        expect (await logic.getNumber()).to.eq(20);
+        // Logic contract storage location
+        await logic.setNumber(111);
+        expect(await logic.getNumber()).to.eq(111);
 
-        // let returnVar = await proxyContract.getNumber()
-
-        // console.log("rreturnVar: ", returnVar.toString());
-        // expect(returnVar).to.eq(20);
-
-        // console.log("2");
-        // await proxy.setImplementation(logic.address);
-        // await proxyContract.setNumber(30);
-        // expect(await proxyContract.getNumber()).to.eq(30);
-
-        // console.log("3");
-        // await proxyContract.setNumber(40);
-        // console.log("4");
-        // expect(await proxyContract.getNumber()).to.eq(20);
-        // console.log("5");
+        // Proxy storage doesnt change
+        expect (await proxyContract.getNumber()).to.eq(30);
     });
 
+    it("Testing Simple Proxy Call in another way", async () => {
 
-    // it("Testing Simple Proxy Call in another way", async () => {
-     
-    //     const Implementation = await ethers.getContractFactory("ProxyImplementation");
-    //     const proxyContract = await Implementation.attach(
-    //         proxy.address // The deployed contract address
-    //     );  
+        const myProxy = new ethers.Contract(
+            proxy.address,       
+            ["function setNumber(uint _number) external", 
+            "function getNumber() external view returns(uint)"],
+            owner
+        );
+
+        // Set Proxy Storage Location
+        await myProxy.setNumber(20);
+        expect (await myProxy.getNumber()).to.eq(20);
+        await myProxy.setNumber(30);
+        expect (await myProxy.getNumber()).to.eq(30);
         
-    //     const myProxy = new ethers.Contract(
-    //         proxy.address,       
-    //         ["function setNumber(uint _number) external", 
-    //         "function getNumber() external view returns(uint)"],
-    //         owner
-    //     );
+        // Logic contract storage location
+        await logic.setNumber(111);
+        expect(await logic.getNumber()).to.eq(111);
 
-    //     await myProxy.setNumber(100);
-    //     console.log("My Proxy: ", (await myProxy.getNumber()).toString());
-    //     // expect(await proxyContract.getNumber()).to.eq(100);
-    //     // expect(await myProxy.getNumber()).to.eq(100);
-
-        
-    //     // await proxyContract.setNumber(20);
-    //     // expect(await proxyContract.getNumber()).to.eq(20);
-    //     // expect(await myProxy.getNumber()).to.eq(20);
-     
-    // });
+        // Proxy storage doesnt change
+        expect (await myProxy.getNumber()).to.eq(30);
+    });
 
 });

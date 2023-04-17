@@ -8,13 +8,10 @@ contract ProxyImplementation {
   uint public number;
 
   function setNumber(uint _number) external {
-    console.log("setNumber: %s", _number);
     number = _number ;
-    console.log("Done setNumber: %s", number);
   }
 
   function getNumber() external view returns(uint){
-    console.log("getNumber: %s", number);
     return number;
   }
 }
