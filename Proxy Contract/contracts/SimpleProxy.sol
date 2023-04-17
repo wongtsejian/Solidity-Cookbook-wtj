@@ -14,20 +14,31 @@ contract SimpleProxy is Proxy {
   address owner; 
 
   constructor() {
-    this.owner = msg.sender;
-    console.log("hello world");
+    owner = msg.sender;
+    console.log("SimpleProxy Constructor owner: %s, Implementation: %s", owner, Implementation);
   }
 
   /**
     * @dev Override parent function to specify
     */
-  function _implementation() internal view virtual returns (address) {
-    return this.Implementation;
+  function _implementation() internal view override returns (address) {
+    console.log(" _implementation: %s", Implementation);
+    return Implementation;
   }
 
-  function setImplementation(address _address) external {
-    require(msg.sender == this.owner, "Invalid Owner");
-    this.Implementation = _address ; 
+  function getImplementation() view public returns (address) { 
+    return _implementation();
   }
 
+  function setImplementation(address _address) public  {
+    require(msg.sender == owner, "Invalid Owner");
+    console.log(" setImplementation: %s, address: %s", Implementation, _address);
+    Implementation = _address ; 
+    console.log(" Implementation: %s set to address: %s", Implementation, _address);
+  }
+
+
+//  function _beforeFallback() internal virtual override {
+//   console.log("before fallback: implementation: ", Implementation);
+//  }
 }
