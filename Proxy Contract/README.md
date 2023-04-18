@@ -16,3 +16,4 @@ When a user interacts with the proxy contract, the proxy contract simply forward
 Read more here: 
 - https://medium.com/coinmonks/proxy-pattern-and-upgradeable-smart-contracts-45d68d6f15da 
 - https://eips.ethereum.org/EIPS/eip-1967
+- https://ethereum.stackexchange.com/questions/140208/what-do-we-mean-by-collision-prevention-when-we-are-writing-proxy-contract-for-a 
