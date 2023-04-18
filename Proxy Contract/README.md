@@ -17,3 +17,4 @@ Read more here:
 - https://medium.com/coinmonks/proxy-pattern-and-upgradeable-smart-contracts-45d68d6f15da 
 - https://eips.ethereum.org/EIPS/eip-1967
 - https://ethereum.stackexchange.com/questions/140208/what-do-we-mean-by-collision-prevention-when-we-are-writing-proxy-contract-for-a 
+- https://medium.com/1milliondevs/solidity-storage-layout-for-proxy-contracts-and-diamonds-c4f009b6903 
