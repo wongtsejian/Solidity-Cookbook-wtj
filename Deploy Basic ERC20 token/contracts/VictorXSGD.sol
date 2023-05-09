@@ -12,9 +12,4 @@ contract VictorXSGD is ERC20 {
     function mint(address to, uint256 amount) public {
         _mint(to, amount);
     }
-
-    function haha() view public returns (uint256) {
-        console.log("calling haha");
-        return 123;
-    }
 }
