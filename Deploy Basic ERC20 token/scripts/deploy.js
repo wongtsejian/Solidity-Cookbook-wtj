@@ -1,7 +1,8 @@
-import { ethers } from "hardhat";
+const hre = require("hardhat");
 
 // run the script like so npx hardhat run --network <network-name> scripts/deploy.ts
 async function main() {
+  var ethers = hre.ethers;
   const ContractFactory = await ethers.getContractFactory("VictorXSGD");
 
   const instance = await ContractFactory.deploy();

@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/contracts/VictorXSGD.sol": {
-      "lastModificationDate": 1683622453067,
-      "contentHash": "ac8252d6adb7f4f9f27c92dd94479cb9",
+      "lastModificationDate": 1683627217837,
+      "contentHash": "a24c3e55aa01d5b5529ad2f824f350d0",
       "sourceName": "contracts/VictorXSGD.sol",
       "solcConfig": {
         "version": "0.8.18",
@@ -29,8 +29,8 @@
         }
       },
       "imports": [
-        "@openzeppelin/contracts/token/ERC20/ERC20.sol",
-        "@openzeppelin/contracts/access/Ownable.sol"
+        "hardhat/console.sol",
+        "@openzeppelin/contracts/token/ERC20/ERC20.sol"
       ],
       "versionPragmas": [
         "^0.8.9"
@@ -220,6 +220,41 @@
       ],
       "artifacts": [
         "IERC20Metadata"
+      ]
+    },
+    "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1683620945097,
+      "contentHash": "4ff3cd2f6272c9a6516e9ee4f2b967d3",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.18",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">= 0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
       ]
     }
   }

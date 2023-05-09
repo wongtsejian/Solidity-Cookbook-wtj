@@ -10,3 +10,12 @@ npx hardhat run --network <network-name> scripts/deploy.ts
 npx hardhat run --network mumbai scripts/deploy.ts
 npx hardhat run scripts/deploy.ts
 ```
+
+
+
+## Check your balance first 
+For sanity check - ensure that have enough gas to do any deployment first.
+
+```
+npx hardhat run scripts/check-balance.js --network mumbai 
+```
