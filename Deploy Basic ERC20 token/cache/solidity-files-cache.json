@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/workspaces/Solidity-Cookbook/Deploy Basic ERC20 token/contracts/VictorXSGD.sol": {
-      "lastModificationDate": 1683643106331,
-      "contentHash": "a24c3e55aa01d5b5529ad2f824f350d0",
+      "lastModificationDate": 1683644907737,
+      "contentHash": "317dcbe374368f4454b534304dc8052b",
       "sourceName": "contracts/VictorXSGD.sol",
       "solcConfig": {
         "version": "0.8.18",

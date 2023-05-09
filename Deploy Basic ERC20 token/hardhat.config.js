@@ -25,4 +25,11 @@ module.exports = {
     }
   },
 
+  // for verifying source code contract
+  etherscan: {
+    apiKey: {
+      polygonMumbai: "7E5R461T3GA968ANK43AJA4RW47PDBG79G" // victor's polygonscan api key
+    }
+  }
+
 };
