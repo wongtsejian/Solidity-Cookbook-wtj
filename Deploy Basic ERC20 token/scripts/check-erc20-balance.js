@@ -27,48 +27,35 @@ async function deploy() {
   await instance.deployed();
 
   console.log(`Contract deployed to ${instance.address}`);
-}
 
+  return instance.address;
+}
 
 async function main() {
 
-  await deploy();
+  const tokenContractAddress = await deploy();
   const [signer] = await hre.ethers.getSigners();
   const signerAddress = await signer.getAddress();
   console.log(`Signer Address: ${signerAddress}`);
-  const tokenContractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
-  // replace with your values
-  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   const abi = [
     // Add your contract's ABI here
     "function balanceOf(address owner) view returns (uint256)",
-    // "function haha(address owner) view returns (uint256)",
-    "function haha() pure public returns (uint256)",
-    // Add more functions as needed
   ];
-  console.log("!!!!!!!!!!!!!!!!!");
-  console.log(await hre.ethers.provider.getCode(tokenContractAddress));
 
-  const contract = await hre.ethers.getContractAt(abi, contractAddress, signer);
-  const haha = await contract.haha();
-  console.log(`haha: ${haha}} `);
+  // ensure that the address has smart contract data by checking that 
+  // hre.ethers.provider.getCode(ADDRESS) returns a non 0 value
+  // console.log(await hre.ethers.provider.getCode(tokenContractAddress));
 
-  // Now you can call functions on the contract
+  const contract = await hre.ethers.getContractAt(abi, tokenContractAddress, signer);
   const balance = await contract.balanceOf(signer.address);
-  console.log(`Balance: ${hre.ethers.utils.formatUnits(balance, 18)} Tokens`);
-//-----------------------------------
+  console.log(`Balance method 1: ${hre.ethers.utils.formatUnits(balance, 18)} Tokens`);
 
-
-
-
-//   const ERC20ABI = ["function balanceOf(address account) external view returns (uint256)"];
+  // alternative method
   const ERC20ABI = getTheAbi();
   const token = await hre.ethers.getContractAt(ERC20ABI, tokenContractAddress, signer);
   tokenBalance = await token.balanceOf(signerAddress);
-
-  console.log(`Balance: ${ethers.utils.formatUnits(tokenBalance, 18)} Tokens`);
-
+  console.log(`Balance method 2: ${ethers.utils.formatUnits(tokenBalance, 18)} Tokens`);
 }
 
 main()

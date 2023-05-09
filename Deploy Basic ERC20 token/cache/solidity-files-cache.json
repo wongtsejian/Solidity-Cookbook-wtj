@@ -1,8 +1,8 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/contracts/VictorXSGD.sol": {
-      "lastModificationDate": 1683627217837,
+    "/workspaces/Solidity-Cookbook/Deploy Basic ERC20 token/contracts/VictorXSGD.sol": {
+      "lastModificationDate": 1683643106331,
       "contentHash": "a24c3e55aa01d5b5529ad2f824f350d0",
       "sourceName": "contracts/VictorXSGD.sol",
       "solcConfig": {
@@ -39,8 +39,43 @@
         "VictorXSGD"
       ]
     },
-    "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol": {
-      "lastModificationDate": 1683620944557,
+    "/workspaces/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/hardhat/console.sol": {
+      "lastModificationDate": 1683643350259,
+      "contentHash": "4ff3cd2f6272c9a6516e9ee4f2b967d3",
+      "sourceName": "hardhat/console.sol",
+      "solcConfig": {
+        "version": "0.8.18",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        ">= 0.4.22 <0.9.0"
+      ],
+      "artifacts": [
+        "console"
+      ]
+    },
+    "/workspaces/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+      "lastModificationDate": 1683643349455,
       "contentHash": "834a0dde221759af42b030253315b086",
       "sourceName": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
       "solcConfig": {
@@ -78,45 +113,8 @@
         "ERC20"
       ]
     },
-    "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/access/Ownable.sol": {
-      "lastModificationDate": 1683620944777,
-      "contentHash": "e436cea06129be2c73cda4b1acc848b5",
-      "sourceName": "@openzeppelin/contracts/access/Ownable.sol",
-      "solcConfig": {
-        "version": "0.8.18",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../utils/Context.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Ownable"
-      ]
-    },
-    "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/utils/Context.sol": {
-      "lastModificationDate": 1683620944457,
+    "/workspaces/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/utils/Context.sol": {
+      "lastModificationDate": 1683643349315,
       "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
       "sourceName": "@openzeppelin/contracts/utils/Context.sol",
       "solcConfig": {
@@ -150,8 +148,8 @@
         "Context"
       ]
     },
-    "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
-      "lastModificationDate": 1683620944697,
+    "/workspaces/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+      "lastModificationDate": 1683643349631,
       "contentHash": "ad7c2d0af148c8f9f097d65deeb4da6b",
       "sourceName": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
       "solcConfig": {
@@ -185,8 +183,8 @@
         "IERC20"
       ]
     },
-    "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
-      "lastModificationDate": 1683620944697,
+    "/workspaces/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
+      "lastModificationDate": 1683643349635,
       "contentHash": "909ab67fc5c25033fe6cd364f8c056f9",
       "sourceName": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
       "solcConfig": {
@@ -220,41 +218,6 @@
       ],
       "artifacts": [
         "IERC20Metadata"
-      ]
-    },
-    "/home/vic/Solidity-Cookbook/Deploy Basic ERC20 token/node_modules/hardhat/console.sol": {
-      "lastModificationDate": 1683620945097,
-      "contentHash": "4ff3cd2f6272c9a6516e9ee4f2b967d3",
-      "sourceName": "hardhat/console.sol",
-      "solcConfig": {
-        "version": "0.8.18",
-        "settings": {
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        ">= 0.4.22 <0.9.0"
-      ],
-      "artifacts": [
-        "console"
       ]
     }
   }
