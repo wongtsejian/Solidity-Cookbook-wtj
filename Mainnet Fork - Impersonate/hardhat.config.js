@@ -2,6 +2,8 @@ require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
 
 /** @type import('hardhat/config').HardhatUserConfig */
+
+/** set a forking param to the default network to fork the main net */
 module.exports = {
   solidity: "0.8.18",
   networks: {
