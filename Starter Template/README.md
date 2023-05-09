@@ -1,6 +1,5 @@
 # Overview
-
-Copy the nix shell and package.json to setup a basic solidity dev environment out of the box.
+Copy the shell.nix and package.json to setup a basic solidity dev environment out of the box.
 
 # Nix 
 
