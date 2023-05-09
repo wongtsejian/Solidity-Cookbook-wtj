@@ -5,7 +5,7 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract VictorXSGD is ERC20 {
-    constructor() ERC20("victorXSGD", "XSGDVIC1") {
+    constructor() ERC20("victorXSGD", "XSGD") {
         _mint(msg.sender, 10000000000 * 10 ** decimals());
     }
 
