@@ -9,7 +9,7 @@ Copy the shell.nix and package.json to setup a basic solidity dev environment ou
 # Setting up Nix environment for PBMRC1
 - Clone this repository in to your local drive
 - Navigate to this repository
-- Run nix-shell to start the shell with all the dev environment required. The following dependencies (see package.json file for details) will be installed:
+- Run `nix-shell` command in terminal to start the shell with all the dev environment required. The following dependencies (see package.json file for details) will be installed:
   - nodejs version 18
   - hardhat and hardhat plugins
   - chai
