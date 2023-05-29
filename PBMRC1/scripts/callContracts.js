@@ -13,14 +13,15 @@ const hardhat3Address = "0x683C816C6C6CaC1B3c850fc55061C47838C8E041";
 const hardhat3AddressPrivateKey= secrets.METAMASK_PRIVATE_KEYS[2];
 const hardhat4Address = "0x8a832b32C2158C6Ff118b0D019f8697bfB6B5Ed4";
 const hardhat4AddressPrivateKey= secrets.METAMASK_PRIVATE_KEYS[3];
-
+/**
 async function getJSONInterface() {
     const MultiSigWallet = await hre.ethers.getContractAt("MultiSignatureWallet", CONTRACT_ADDRESS);
     const jsonInterface = MultiSigWallet.interface.format('json');
     console.log(jsonInterface);
     return jsonInterface;
 }
-const jsonInterface = getJSONInterface();
+ */
+const jsonInterface = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"owners","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"transactionId","type":"uint256"}],"name":"revokeConfirmation","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"isOwner","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"},{"name":"","type":"address"}],"name":"confirmations","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"transactions","outputs":[{"name":"executed","type":"bool"},{"name":"destination","type":"address"},{"name":"value","type":"uint256"},{"name":"data","type":"bytes"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"transactionCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"transactionId","type":"uint256"}],"name":"confirmTransaction","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"destination","type":"address"},{"name":"value","type":"uint256"},{"name":"data","type":"bytes"}],"name":"submitTransaction","outputs":[{"name":"transactionId","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"required","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"transactionId","type":"uint256"}],"name":"executeTransaction","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"_owners","type":"address[]"},{"name":"_required","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"sender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"transactionId","type":"uint256"}],"name":"Submission","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"sender","type":"address"},{"indexed":true,"name":"transactionId","type":"uint256"}],"name":"Confirmation","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"transactionId","type":"uint256"}],"name":"Execution","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"transactionId","type":"uint256"}],"name":"ExecutionFailure","type":"event"}];
 /** 
  * Working ABI retrieved from polygonscan
  * const jsonInterface = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"owners","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"transactionId","type":"uint256"}],"name":"revokeConfirmation","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"}],"name":"isOwner","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"},{"name":"","type":"address"}],"name":"confirmations","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"transactions","outputs":[{"name":"executed","type":"bool"},{"name":"destination","type":"address"},{"name":"value","type":"uint256"},{"name":"data","type":"bytes"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"transactionCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"transactionId","type":"uint256"}],"name":"confirmTransaction","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"destination","type":"address"},{"name":"value","type":"uint256"},{"name":"data","type":"bytes"}],"name":"submitTransaction","outputs":[{"name":"transactionId","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"required","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"transactionId","type":"uint256"}],"name":"executeTransaction","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"inputs":[{"name":"_owners","type":"address[]"},{"name":"_required","type":"uint256"}],"payable":true,"stateMutability":"payable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"sender","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"transactionId","type":"uint256"}],"name":"Submission","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"sender","type":"address"},{"indexed":true,"name":"transactionId","type":"uint256"}],"name":"Confirmation","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"transactionId","type":"uint256"}],"name":"Execution","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"transactionId","type":"uint256"}],"name":"ExecutionFailure","type":"event"}]
@@ -42,15 +43,9 @@ contract.setProvider(provider);
 
 contract.defaultChain = "mumbai";
 
-contract.defaultAccount = hardhat1Address;
 
-//retrieve transaction count
-const transactionCount = contract.methods.transactionCount()
-.call()
-.then((result) => console.log("Transaction Counts: ", result))
-.catch((error) => {
-    console.error('Error:', error);
-  });
+
+
 /**
 //retrieve confirmations for transactions
 const confirmations = contract.methods.confirmations(1,hardhat1Address)
@@ -61,7 +56,7 @@ const confirmations = contract.methods.confirmations(1,hardhat1Address)
   });
 
 
-
+*/
 const { Alchemy, Network, Wallet, Utils } = require("alchemy-sdk");
 
 const settings = {
@@ -74,8 +69,50 @@ let wallet2 = new Wallet(secrets.METAMASK_PRIVATE_KEYS[1]);
 let wallet3 = new Wallet(secrets.METAMASK_PRIVATE_KEYS[2]);
 let wallet4 = new Wallet(secrets.METAMASK_PRIVATE_KEYS[3]);
 
+
+//retrieve transaction count
+
+async function getTransactionCount() {
+    return contract.methods.transactionCount()
+    .call()
+    .then((result) => {
+        console.log("Transaction count: ", result);
+        return result;
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+    });
+
+}
+
+//confirm transaction
+
+async function confirmTransaction(transactionCount) {
+    contract.defaultAccount = hardhat3Address;
+    const nonce = await alchemy.core.getTransactionCount(
+        wallet3.address,
+        "latest"
+    );
+    const data = contract.methods.confirmTransaction(transactionCount).encodeABI();
+    const transaction = {
+        from: hardhat3Address,
+        to: CONTRACT_ADDRESS,
+        data: data,
+        gasLimit: "210000",
+        maxPriorityFeePerGas: Utils.parseUnits("5", "gwei"),
+        maxFeePerGas: Utils.parseUnits("100", "gwei"),
+        nonce: nonce,
+        type: 2,
+        chainId: 80001,
+    };
+    let rawTransaction = await wallet3.signTransaction(transaction);
+    let tx = await alchemy.core.sendTransaction(rawTransaction);
+    console.log("Confirm transaction", tx);
+}
+
 //submit transaction
 async function submitTransaction() {
+    contract.defaultAccount = hardhat1Address;
     const nonce = await alchemy.core.getTransactionCount(
         wallet1.address,
         "latest"
@@ -96,32 +133,14 @@ async function submitTransaction() {
     let rawTransaction = await wallet1.signTransaction(transaction);
     let tx = await alchemy.core.sendTransaction(rawTransaction);
     console.log("Sent transaction", tx);
+    
 }
-//submitTransaction();
 
-
-//confirm transaction
-
-async function confirmTransaction() {
-    const nonce = await alchemy.core.getTransactionCount(
-        wallet3.address,
-        "latest"
-    );
-    const data = contract.methods.confirmTransaction(2).encodeABI();
-    const transaction = {
-        from: hardhat3Address,
-        to: CONTRACT_ADDRESS,
-        data: data,
-        gasLimit: "210000",
-        maxPriorityFeePerGas: Utils.parseUnits("5", "gwei"),
-        maxFeePerGas: Utils.parseUnits("100", "gwei"),
-        nonce: nonce,
-        type: 2,
-        chainId: 80001,
-    };
-    let rawTransaction = await wallet3.signTransaction(transaction);
-    let tx = await alchemy.core.sendTransaction(rawTransaction);
-    console.log("Sent transaction", tx);
+async function main() {
+    await submitTransaction();
+    const count = await getTransactionCount();
+    confirmTransaction(count);
+    
 }
-confirmTransaction();
-*/
+main();
+
