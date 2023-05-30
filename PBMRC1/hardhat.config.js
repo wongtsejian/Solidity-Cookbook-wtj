@@ -30,6 +30,9 @@ module.exports = {
       {
         version: "0.5.10", // Second compiler version
       },
+      {
+        version: "0.4.15", // Third compiler version
+      },
     ],
   },
   etherscan: {
