@@ -22,6 +22,7 @@
 pragma solidity 0.8.18;
 
 contract QRLookup {
+    
     address[] private owners;
     address[] private acquirers;
     //mapping maps address of acquirer to a mapping of a hash of the QR_dest_info to the address of the merchant
@@ -46,7 +47,10 @@ contract QRLookup {
         _;
     }
     
-    function isOwner(address owner) public view returns (bool){
+    function isOwner(address owner) 
+        public 
+        view 
+        returns (bool){
         for (uint index = 0; index < owners.length; index++) {
             if (owners[index] == owner) {
                 return true;
@@ -55,15 +59,22 @@ contract QRLookup {
         return false;
     }
 
-    function getOwner() public view returns (address[] memory) {
+    function getOwner() 
+        public 
+        view 
+        returns (address[] memory) {
         return owners;
     }
 
-    function addOwner(address newOwner) public onlyOwner {
+    function addOwner(address newOwner) 
+        public 
+        onlyOwner {
         owners.push(newOwner);
     }
 
-    function removeOwner(address oldOwner) public onlyOwner {
+    function removeOwner(address oldOwner) 
+        public 
+        onlyOwner {
         //require oldOwner to be in owners array
         require(isOwner(oldOwner),"Error: Not an owner");
         require(owners.length > 1,"Error: Cannot remove last owner");
@@ -76,7 +87,10 @@ contract QRLookup {
             }
         }
     }
-    function isAcquirer(address acquirer) public view returns (bool){
+    function isAcquirer(address acquirer) 
+        public 
+        view 
+        returns (bool){
         for (uint index = 0; index < acquirers.length; index++) {
             if (acquirers[index] == acquirer) {
                 return true;
@@ -84,13 +98,20 @@ contract QRLookup {
         }
         return false;
     }
-    function addAcquirer(address newAcquirer) public onlyOwner {
+    function addAcquirer(address newAcquirer) 
+        public 
+        onlyOwner {
         acquirers.push(newAcquirer);
     }
-    function getAcquirers() public view returns (address[] memory) {
+    function getAcquirers() 
+        public 
+        view 
+        returns (address[] memory) {
         return acquirers;
     }
-    function removeAcquirer(address oldAcquirer) public onlyOwner {
+    function removeAcquirer(address oldAcquirer) 
+        public 
+        onlyOwner {
         //require oldAcquirer to be in acquirers array
         require(isAcquirer(oldAcquirer),"Error: Not an acquirer");
         require(acquirers.length > 0,"Error: There are no acquirers");
@@ -104,27 +125,37 @@ contract QRLookup {
         }
     }
 
-    function key(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) internal pure returns (bytes32) {
-        return hash(abi.encodePacked(merchantName, ",", merchantCity, ",", countryCode, ",", globalUniqueIdentifier, ",", paymentNetworkSpecific));
+    function key(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) 
+        internal 
+        pure 
+        returns (bytes32) {
+        return keccak256(abi.encodePacked(merchantName, ",", merchantCity, ",", countryCode, ",", globalUniqueIdentifier, ",", paymentNetworkSpecific));
     }
 
-    function hash(bytes memory csv) internal pure returns (bytes32){
-        return keccak256(abi.encodePacked(csv));
+    function registerQR(string calldata _merchantName, string calldata _merchantCity, string calldata _countryCode, string calldata _globalUniqueIdentifier, string calldata _paymentNetworkSpecific, address merchantAddress) 
+        public 
+        onlyAcquirer 
+        noExistingMerchant(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific){
+        lookup[msg.sender][key(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific)] = merchantAddress;
     }
 
-    function registerQR(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific, address merchantAddress) public onlyAcquirer noExistingMerchant(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific){
-        lookup[msg.sender][key(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific)] = merchantAddress;
-    }
-
-    function deleteQR(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) public onlyAcquirer {
+    function deleteQR(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) 
+        public 
+        onlyAcquirer {
         delete lookup[msg.sender][key(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific)];
     }
 
-    function merchantAlreadyExists(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) public view returns (bool) {
+    function merchantAlreadyExists(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) 
+        public 
+        view 
+        returns (bool) {
         return lookup[msg.sender][key(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific)] != address(0);
     }
 
-    function getMerchantAddress(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) public view returns (address){
+    function getMerchantAddress(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) 
+        public 
+        view 
+        returns (address){
         return lookup[msg.sender][key(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific)];
     }
 
