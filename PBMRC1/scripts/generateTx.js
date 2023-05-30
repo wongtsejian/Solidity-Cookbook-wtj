@@ -41,84 +41,102 @@ async function main() {
         value: 0,
     }
     var hasSelectedFn = false;
-
+    var needSubmitTx = true;
+    var data = null;
+    var unsignedTx = null;
+    var selectedFn = null;
     while(!hasSelectedFn){
         // Get user input on which function to call. User can call replaceOwner, addOwner, removeOwner, confirmTransaction, revokeConfirmation and changeRequirement.
-        const fnToCall = readlineSync.question("Enter the corresponding number to select transaction to generate: /n1. replaceOwner/n2. addOwner/n3. removeOwner/n4. confirmTransaction/n5. revokeConfirmation/n6. changeRequirement");
+        const fnToCall = readlineSync.question("Enter the corresponding number to select transaction to generate: \n1. replaceOwner\n2. addOwner\n3. removeOwner\n4. confirmTransaction\n5. revokeConfirmation\n6. changeRequirement\nSelected Function:");
         console.log('Function selected:', fnToCall);
-        var data = null;
         switch(fnToCall){
+            // As only the multi-signature wallet can call replaceOwner, addOwner, removeOwner, and changeRequirement, the function calls are wrapped in a submitTransaction function call to allow the multi-signature wallet to call them once sufficient confirmations are met
+            // As confirmTransaction and revokeConfirmation are signed individually, the function calls are not wrapped in a submitTransaction function call
             case "1":
                 data = replaceOwner(contract);
                 hasSelectedFn = true;
+                selectedFn = "replaceOwner";
                 break;
             case "2":
                 data = addOwner(contract);
                 hasSelectedFn = true;
+                selectedFn = "addOwner";
                 break;
             case "3":
                 data = removeOwner(contract);
                 hasSelectedFn = true;
+                selectedFn = "removeOwner";
                 break;
             case "4":
-                data = confirmTransaction(contract);
+                unsignedTx = await confirmTransaction(contract,overrides);
+                console.log("UnsignedTx:",unsignedTx);
                 hasSelectedFn = true;
+                selectedFn = "confirmTransaction";
+                needSubmitTx = false;
                 break;
             case "5":
-                data = revokeConfirmation(contract);
+                unsignedTx = await revokeConfirmation(contract,overrides);
+                console.log("UnsignedTx:",unsignedTx);
                 hasSelectedFn = true;
+                selectedFn = "revokeConfirmation";
+                needSubmitTx = false;
                 break;
             case "6":
                 data = changeRequirement(contract);
                 hasSelectedFn = true;
+                selectedFn = "changeRequirement";
                 break;
             default:
-                console.log("Invalid input. Please try again.");
+                console.log("Invalid input. Please try again.\n");
         }
     }
 
     // Create an unsigned replaceOwner transaction object
     //const replaceOwnerUnsignedMsg = await contract.populateTransaction.submitTransaction(CONTRACT_ADDRESS,0,replaceOwnerData);
     //console.log(replaceOwnerUnsignedMsg);
-    const unsignedTx = generateUnsignedSubmitTx(data);
+    
+    if (needSubmitTx){
+        unsignedTx = await generateUnsignedSubmitTx(contract,data,overrides);
+        console.log("UnsignedTx:",unsignedTx);
+    } 
 
     // Save transaction as JSON file
     const txJson = JSON.stringify(unsignedTx);
-    console.log(txJson);
-    fs.writeFileSync('tx.json', txJson);
+    console.log("TxJson",txJson);
+    
+    // Import the filenameGenerator file
+    const generateFilename = require('./utils');
+    // Generate a filename for the transaction
+    const filename = generateFilename(selectedFn);
 
+    fs.writeFileSync(filename, txJson);
 
+    /** Send the signed transaction object to the network for testing to confirm the item works
     // Sign transaction object offline using ethers.js
-    const wallet1 = new ethers.Wallet(secrets.METAMASK_PRIVATE_KEYS[0], provider);
-    const signedTransaction1a = await wallet1.populateTransaction(replaceOwnerUnsignedMsg);
-    const signedTransaction1b = await wallet1.signTransaction(signedTransaction1a);
+    //Get user input for which wallet to sign the transaction
+    const walletToSign = readlineSync.question("Enter the corresponding number to select wallet to sign the transaction: \n1. hardhat1\n2. hardhat2\n3. hardhat3\n4. hardhat4\nSelected Wallet:");
+    console.log('Wallet selected:', walletToSign);
+    const wallet = new ethers.Wallet(secrets.METAMASK_PRIVATE_KEYS[walletToSign-1], provider);
+
+    const signedTransaction1a = await wallet.populateTransaction(unsignedTx);
+    const signedTransaction1b = await wallet.signTransaction(signedTransaction1a);
     console.log(signedTransaction1b);
 
     // Send the signed transaction object to the network
     const tx = await provider.sendTransaction(signedTransaction1b);
-    console.log(tx);
-
-    /**
-    // Create an unsigned confirmTransaction transaction object
-    const confirmTransactionUnsignedMsg = await contract.populateTransaction.confirmTransaction(0,overrides);
-    console.log(confirmTransactionUnsignedMsg);
-
-    // Save transaction as JSON file
-    const txJson2 = JSON.stringify(confirmTransactionUnsignedMsg);
-    console.log(txJson2);
-    fs.writeFileSync('tx2.json', txJson2);
-
-    // Sign transaction object offline using ethers.js
-    const wallet2 = new ethers.Wallet(secrets.METAMASK_PRIVATE_KEYS[1], provider);
-    const signedTransaction2 = await wallet2.signTransaction(confirmTransactionUnsignedMsg);
-    console.log(signedTransaction2);
+    console.log("Sent Tx:",tx);
     */
 }
+// Send signed transaction object to the network
+async function sendSignedTx(signedTransaction,provider){
+    const tx = await provider.sendTransaction(signedTransaction);
+    console.log("Sent Tx:",tx);
+}
 
-async function generateUnsignedSubmitTx(data) {
+async function generateUnsignedSubmitTx(contract,data,overrides) {
     // Create an unsigned replaceOwner transaction object
-    const unsignedTx = await contract.populateTransaction.submitTransaction(CONTRACT_ADDRESS,0,data);
-    console.log(unsignedTx);
+    const unsignedTx = await contract.populateTransaction.submitTransaction(CONTRACT_ADDRESS,0,data,overrides);
+    console.log("UnsignedTx:",unsignedTx);
     return unsignedTx;
 }
 
@@ -158,26 +176,26 @@ async function removeOwner(contract){
     return removeOwnerData;
 }
 
-async function confirmTransaction(contract){
+async function confirmTransaction(contract,overrides){
     // Get user input for transaction ID to confirm
     const transactionId = readlineSync.question("Enter the transaction ID: ");
     console.log('Transaction ID:', transactionId);
 
     //Encode the function call
-    const confirmTransactionData = contract.interface.encodeFunctionData('confirmTransaction', [transactionId]);
+    const unsignedTx = await contract.populateTransaction.confirmTransaction(transactionId,overrides);
 
-    return confirmTransactionData;
+    return unsignedTx;
 }
 
-async function revokeConfirmation(contract){
+async function revokeConfirmation(contract,overrides){
     // Get user input for transaction ID to revoke
     const transactionId = readlineSync.question("Enter the transaction ID: ");
     console.log('Transaction ID:', transactionId);
 
     //Encode the function call
-    const revokeConfirmationData = contract.interface.encodeFunctionData('revokeConfirmation', [transactionId]);
+    const unsignedTx = await contract.populateTransaction.revokeConfirmation(transactionId,overrides);
 
-    return revokeConfirmationData;
+    return unsignedTx;
 }
 
 async function changeRequirement(contract){
