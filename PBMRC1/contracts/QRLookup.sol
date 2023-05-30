@@ -23,13 +23,13 @@ pragma solidity 0.8.18;
 
 contract QRLookup {
     
-    address[] private owners;
-    address[] private acquirers;
+    address[] private _owners;
+    address[] private _acquirers;
     //mapping maps address of acquirer to a mapping of a hash of the QR_dest_info to the address of the merchant
-    mapping (address => mapping(bytes32 => address)) private lookup;
+    mapping (address => mapping(bytes32 => address)) private _lookup;
     
     constructor() {
-        owners.push(msg.sender);
+        _owners.push(msg.sender);
     }
 
     modifier onlyOwner() {
@@ -42,17 +42,17 @@ contract QRLookup {
         _;
     }
 
-    modifier noExistingMerchant(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) {
-        require(!merchantAlreadyExists(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific),"Error: Merchant already exists. Please delete existing mapping if you wish to overwrite it.");
+    modifier noExistingMerchant(string calldata _merchantName, string calldata _merchantCity, string calldata _countryCode, string calldata _globalUniqueIdentifier, string calldata _paymentNetworkSpecific) {
+        require(!merchantAlreadyExists(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific),"Error: Merchant already exists. Please delete existing mapping if you wish to overwrite it.");
         _;
     }
     
-    function isOwner(address owner) 
+    function isOwner(address _owner) 
         public 
         view 
         returns (bool){
-        for (uint index = 0; index < owners.length; index++) {
-            if (owners[index] == owner) {
+        for (uint index = 0; index < _owners.length; index++) {
+            if (_owners[index] == _owner) {
                 return true;
             }
         }
@@ -63,100 +63,100 @@ contract QRLookup {
         public 
         view 
         returns (address[] memory) {
-        return owners;
+        return _owners;
     }
 
-    function addOwner(address newOwner) 
+    function addOwner(address _newOwner) 
         public 
         onlyOwner {
-        owners.push(newOwner);
+        _owners.push(_newOwner);
     }
 
-    function removeOwner(address oldOwner) 
+    function removeOwner(address _oldOwner) 
         public 
         onlyOwner {
         //require oldOwner to be in owners array
-        require(isOwner(oldOwner),"Error: Not an owner");
-        require(owners.length > 1,"Error: Cannot remove last owner");
+        require(isOwner(_oldOwner),"Error: Not an owner");
+        require(_owners.length > 1,"Error: Cannot remove last owner");
 
         //remove oldOwner from owners array
-        for (uint i = 0; i < owners.length; i++) {
-            if (owners[i] == oldOwner) {
-                delete owners[i];
+        for (uint i = 0; i < _owners.length; i++) {
+            if (_owners[i] == _oldOwner) {
+                delete _owners[i];
                 break;
             }
         }
     }
-    function isAcquirer(address acquirer) 
+    function isAcquirer(address _acquirer) 
         public 
         view 
         returns (bool){
-        for (uint index = 0; index < acquirers.length; index++) {
-            if (acquirers[index] == acquirer) {
+        for (uint index = 0; index < _acquirers.length; index++) {
+            if (_acquirers[index] == _acquirer) {
                 return true;
             }
         }
         return false;
     }
-    function addAcquirer(address newAcquirer) 
+    function addAcquirer(address _newAcquirer) 
         public 
         onlyOwner {
-        acquirers.push(newAcquirer);
+        _acquirers.push(_newAcquirer);
     }
     function getAcquirers() 
         public 
         view 
         returns (address[] memory) {
-        return acquirers;
+        return _acquirers;
     }
-    function removeAcquirer(address oldAcquirer) 
+    function removeAcquirer(address _oldAcquirer) 
         public 
         onlyOwner {
         //require oldAcquirer to be in acquirers array
-        require(isAcquirer(oldAcquirer),"Error: Not an acquirer");
-        require(acquirers.length > 0,"Error: There are no acquirers");
+        require(isAcquirer(_oldAcquirer),"Error: Not an acquirer");
+        require(_acquirers.length > 0,"Error: There are no acquirers");
 
         //remove oldAcquirer from acquirers array
-        for (uint i = 0; i < acquirers.length; i++) {
-            if (acquirers[i] == oldAcquirer) {
-                delete acquirers[i];
+        for (uint i = 0; i < _acquirers.length; i++) {
+            if (_acquirers[i] == _oldAcquirer) {
+                delete _acquirers[i];
                 break;
             }
         }
     }
 
-    function key(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) 
+    function _key(string calldata _merchantName, string calldata _merchantCity, string calldata _countryCode, string calldata _globalUniqueIdentifier, string calldata _paymentNetworkSpecific) 
         internal 
         pure 
         returns (bytes32) {
-        return keccak256(abi.encodePacked(merchantName, ",", merchantCity, ",", countryCode, ",", globalUniqueIdentifier, ",", paymentNetworkSpecific));
+        return keccak256(abi.encodePacked(_merchantName, ",", _merchantCity, ",", _countryCode, ",", _globalUniqueIdentifier, ",", _paymentNetworkSpecific));
     }
 
-    function registerQR(string calldata _merchantName, string calldata _merchantCity, string calldata _countryCode, string calldata _globalUniqueIdentifier, string calldata _paymentNetworkSpecific, address merchantAddress) 
+    function registerQR(string calldata _merchantName, string calldata _merchantCity, string calldata _countryCode, string calldata _globalUniqueIdentifier, string calldata _paymentNetworkSpecific, address _merchantAddress) 
         public 
         onlyAcquirer 
         noExistingMerchant(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific){
-        lookup[msg.sender][key(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific)] = merchantAddress;
+        _lookup[msg.sender][_key(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific)] = _merchantAddress;
     }
 
-    function deleteQR(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) 
+    function deleteQR(string calldata _merchantName, string calldata _merchantCity, string calldata _countryCode, string calldata _globalUniqueIdentifier, string calldata _paymentNetworkSpecific) 
         public 
         onlyAcquirer {
-        delete lookup[msg.sender][key(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific)];
+        delete _lookup[msg.sender][_key(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific)];
     }
 
-    function merchantAlreadyExists(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) 
+    function merchantAlreadyExists(string calldata _merchantName, string calldata _merchantCity, string calldata _countryCode, string calldata _globalUniqueIdentifier, string calldata _paymentNetworkSpecific) 
         public 
         view 
         returns (bool) {
-        return lookup[msg.sender][key(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific)] != address(0);
+        return _lookup[msg.sender][_key(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific)] != address(0);
     }
 
-    function getMerchantAddress(string calldata merchantName, string calldata merchantCity, string calldata countryCode, string calldata globalUniqueIdentifier, string calldata paymentNetworkSpecific) 
+    function getMerchantAddress(string calldata _merchantName, string calldata _merchantCity, string calldata _countryCode, string calldata _globalUniqueIdentifier, string calldata _paymentNetworkSpecific) 
         public 
         view 
         returns (address){
-        return lookup[msg.sender][key(merchantName, merchantCity, countryCode, globalUniqueIdentifier, paymentNetworkSpecific)];
+        return _lookup[msg.sender][_key(_merchantName, _merchantCity, _countryCode, _globalUniqueIdentifier, _paymentNetworkSpecific)];
     }
 
 }
