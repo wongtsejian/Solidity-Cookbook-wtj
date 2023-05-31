@@ -27,16 +27,24 @@ contract QRLookup {
     // Events
     event OwnerAdded(address indexed owner);
     event OwnerRemoved(address indexed owner);
-    event AcquirerAdded(address indexed acquirer);
-    event AcquirerRemoved(address indexed acquirer);
-    event MerchantRegistered(address indexed acquirer, string hashOfQRDestInfo, address indexed merchantAddress);
-    event MerchantDeleted(address indexed acquirer, string hashOfQRDestInfo);
+    event AcquirerAdded(address indexed acquirer, string organisationName);
+    event AcquirerRemoved(address indexed acquirer, string organisationName);
+    event MerchantRegistered(string indexed organisationName, string hashOfQRDestInfo, address indexed merchantAddress);
+    event MerchantDeleted(string indexed organisationName, string hashOfQRDestInfo, address indexed merchantAddress);
+    event OrganisationAdded(string indexed organisationName);
+    event OrganisationRemoved(string indexed organisationName);
 
     // State variables
+    // array of owners' addresses
     address[] private _owners;
+    // array of whitelisted acquirers' addresses
     address[] private _acquirers;
-    //mapping maps address of acquirer to a mapping of a hash of the QR_dest_info to the address of the merchant
-    mapping (address => mapping(string => address)) private _lookup;
+    // array of whitelisted acquirers' organisation names
+    string[] private _organisationNames;
+    // _lookup mapping maps address of acquirer to a mapping of a hash of the QR_dest_info to the address of the merchant
+    mapping (string => mapping(string => address)) private _lookup;
+    // _organisation mapping maps address of an acquirer to the name of the organisation acquirer belongs to
+    mapping (address => string) private _organisation;
     
     // @dev Fallback function
     fallback() external payable {
@@ -66,14 +74,26 @@ contract QRLookup {
     }
 
     // @dev Checks if a merchant address is not already registered with a particular acquirer
-    modifier notExistingMerchant(address from, string calldata _hashOfQRDestInfo) {
-        require(!_merchantAlreadyExists(from, _hashOfQRDestInfo),"Error: Merchant already exists. Please delete existing mapping if you wish to overwrite it.");
+    modifier notExistingMerchant(address _from, string calldata _hashOfQRDestInfo) {
+        require(!_merchantAlreadyExists(_from, _hashOfQRDestInfo),"Error: Merchant already exists. Please delete existing mapping if you wish to overwrite it.");
         _;
     }
     
     // @dev Checks if a merchant address is already registered with a particular acquirer
-    modifier isExistingMerchant(address from, string calldata _hashOfQRDestInfo) {
-        require(_merchantAlreadyExists(from, _hashOfQRDestInfo),"Error: Merchant does not exist.");
+    modifier isExistingMerchant(address _from, string calldata _hashOfQRDestInfo) {
+        require(_merchantAlreadyExists(_from, _hashOfQRDestInfo),"Error: Merchant does not exist.");
+        _;
+    }
+
+    // @dev Checks if an organisation name is already registered
+    modifier isExistingOrganisation(string calldata _organisationName) {
+        require(organisationExists(_organisationName),"Error: Organisation does not exist.");
+        _;
+    }
+
+    // @dev Checks if an organisation name is not already registered
+    modifier notExistingOrganisation(string calldata _organisationName) {
+        require(!organisationExists(_organisationName),"Error: Organisation already exists.");
         _;
     }
 
@@ -127,6 +147,46 @@ contract QRLookup {
         }
     }
 
+    // @dev Adds an organisation to the list of organisation names
+    // @param _organisationName The name of the organisation to be added
+    function addOrganisationName(string calldata _organisationName) 
+        public 
+        onlyOwner 
+        notExistingOrganisation(_organisationName){
+        _organisationNames.push(_organisationName);
+        emit OrganisationAdded(_organisationName);
+    }
+
+    // @dev Remove an organisation from list of organisation names
+    // @param _organisationName The name of the organisation to be removed
+    function removeOrganisationName(string calldata _organisationName) 
+        public 
+        onlyOwner {
+        //require organisationName to be in organisationNames array
+        require(_organisationNames.length > 0,"Error: There are no existing organisation names.");
+
+        //remove organisationName from organisationNames array
+        for (uint i = 0; i < _organisationNames.length; i++) {
+            if (keccak256(abi.encodePacked(_organisationNames[i])) == keccak256(abi.encodePacked(_organisationName))) {
+                delete _organisationNames[i];
+                emit OrganisationRemoved(_organisationName);
+                break;
+            }
+        }
+    }
+
+    function organisationExists(string calldata _organisationName) 
+        public 
+        view 
+        returns (bool){
+        for (uint index = 0; index < _organisationNames.length; index++) {
+            if (keccak256(abi.encodePacked(_organisationNames[index])) == keccak256(abi.encodePacked(_organisationName))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // @dev Checks if an address is an acquirer
     // @param _acquirer The address to be checked
     function isAcquirer(address _acquirer) 
@@ -141,16 +201,18 @@ contract QRLookup {
         return false;
     }
     
-    // @dev Adds an acquirer address to the _acquirers array
+    // @dev Adds an acquirer address to the _acquirers array and associates an organisation name to the acquirer
     // @param _newAcquirer The address of the acquirer to be added
-    function addAcquirer(address _newAcquirer) 
+    function addAcquirer(address _newAcquirer, string calldata _organisationName) 
         public 
-        onlyOwner {
+        onlyOwner 
+        isExistingOrganisation(_organisationName){
+        _organisation[_newAcquirer] = _organisationName;
         _acquirers.push(_newAcquirer);
-        emit AcquirerAdded(_newAcquirer);
+        emit AcquirerAdded(_newAcquirer, _organisationName);
     }
 
-    // @dev Gets the list of acquirers
+    // @dev Gets the list of whitelisted acquirers
     function getAcquirers() 
         public 
         view 
@@ -158,7 +220,7 @@ contract QRLookup {
         return _acquirers;
     }
 
-    // @dev Removes an acquirer address from the _acquirers array
+    // @dev Removes an acquirer address from the _acquirers array and removes the association of the organisation name to the acquirer
     // @param _oldAcquirer The address of the acquirer to be removed
     function removeAcquirer(address _oldAcquirer) 
         public 
@@ -170,32 +232,35 @@ contract QRLookup {
         //remove oldAcquirer from acquirers array
         for (uint i = 0; i < _acquirers.length; i++) {
             if (_acquirers[i] == _oldAcquirer) {
+                string memory _organisationName = _organisation[_oldAcquirer];
+                delete _organisation[_oldAcquirer];
                 delete _acquirers[i];
-                emit AcquirerRemoved(_oldAcquirer);
+                emit AcquirerRemoved(_oldAcquirer, _organisationName);
                 break;
             }
         }
     }
 
-    // @dev Registers a merchant address to a hash of the QR_dest_info
+    // @dev Registers a merchant address to a hash of the QR_dest_info and organisation name
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
     // @param _merchantAddress The address of the merchant to be registered
     function registerQR(string calldata _hashOfQRDestInfo, address _merchantAddress) 
         public 
         onlyAcquirer 
         notExistingMerchant(msg.sender, _hashOfQRDestInfo){
-        _lookup[msg.sender][_hashOfQRDestInfo] = _merchantAddress;
-        emit MerchantRegistered(msg.sender, _hashOfQRDestInfo, _merchantAddress);
+        _lookup[_organisation[msg.sender]][_hashOfQRDestInfo] = _merchantAddress;
+        emit MerchantRegistered(_organisation[msg.sender], _hashOfQRDestInfo, _merchantAddress);
     }
 
-    // @dev Deletes a merchant address the _lookup mapping
+    // @dev Deletes a merchant address from the _lookup mapping
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
     function deleteQR(string calldata _hashOfQRDestInfo) 
         public 
         onlyAcquirer 
         isExistingMerchant(msg.sender, _hashOfQRDestInfo){
-        delete _lookup[msg.sender][_hashOfQRDestInfo];
-        emit MerchantDeleted(msg.sender, _hashOfQRDestInfo);
+        address _merchantAddress = _lookup[_organisation[msg.sender]][_hashOfQRDestInfo];
+        delete _lookup[_organisation[msg.sender]][_hashOfQRDestInfo];
+        emit MerchantDeleted(_organisation[msg.sender], _hashOfQRDestInfo, _merchantAddress);
     }
 
     // @dev Checks if a hash of the QR_dest_info is already registered with an acquirer
@@ -205,16 +270,42 @@ contract QRLookup {
         internal 
         view 
         returns (bool) {
-        return _lookup[from][_hashOfQRDestInfo] != address(0);
+        return _lookup[_organisation[from]][_hashOfQRDestInfo] != address(0);
     }
 
-    // @dev Gets the merchant address of a hash of the QR_dest_info
+    // @dev Gets the merchant address when provided with a hash of the QR_dest_info.
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
     function getMerchantAddress(string calldata _hashOfQRDestInfo) 
         public 
         view 
-        returns (address){
-        return _lookup[msg.sender][_hashOfQRDestInfo];
+        returns (address[] memory){
+        address[] memory _merchantAddresses = new address[](1);
+        
+        for (uint i = 0; i<_organisationNames.length; i++) {
+            if (_lookup[_organisationNames[i]][_hashOfQRDestInfo] != address(0)) {
+                if (_merchantAddresses[0] == address(0)) {
+                    _merchantAddresses[0] = _lookup[_organisationNames[i]][_hashOfQRDestInfo];
+                } else {
+                    _merchantAddresses = _pushAddress(_merchantAddresses,_lookup[_organisationNames[i]][_hashOfQRDestInfo]);
+                }
+            }
+        }
+        return _merchantAddresses;
+    }
+    
+    //Utility functions
+    // @dev Pushes a new address to an array of addresses
+    function _pushAddress(address[] memory array, address newAddress) 
+        internal
+        pure 
+        returns (address[] memory) {
+        address[] memory newArray = new address[](array.length + 1);
+
+        for (uint256 i = 0; i < array.length; i++) {
+            newArray[i] = array[i];
+        }
+        newArray[array.length] = newAddress;
+        return newArray;
     }
 
 }
