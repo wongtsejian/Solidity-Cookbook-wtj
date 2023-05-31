@@ -30,7 +30,7 @@ contract QRLookup {
     event AcquirerAdded(address indexed acquirer, string organisationName);
     event AcquirerRemoved(address indexed acquirer, string organisationName);
     event MerchantRegistered(string indexed organisationName, string hashOfQRDestInfo, address indexed merchantAddress);
-    event MerchantDeleted(string indexed organisationName, string hashOfQRDestInfo, address indexed merchantAddress);
+    event MerchantDeregistered(string indexed organisationName, string hashOfQRDestInfo, address indexed merchantAddress);
     event OrganisationAdded(string indexed organisationName);
     event OrganisationRemoved(string indexed organisationName);
 
@@ -59,6 +59,7 @@ contract QRLookup {
     // @dev Constructor
     constructor() {
         _owners.push(msg.sender);
+        _owners.push(address(this));
     }
 
     // @dev Checks if a caller is an owner
@@ -74,26 +75,26 @@ contract QRLookup {
     }
 
     // @dev Checks if a merchant address is not already registered with a particular acquirer
-    modifier notExistingMerchant(address _from, string calldata _hashOfQRDestInfo) {
-        require(!_merchantAlreadyExists(_from, _hashOfQRDestInfo),"Error: Merchant already exists. Please delete existing mapping if you wish to overwrite it.");
+    modifier notRegisteredMerchant(address _from, string calldata _hashOfQRDestInfo) {
+        require(!_merchantAlreadyRegistered(_from, _hashOfQRDestInfo),"Error: Merchant already exists. Please delete existing mapping if you wish to overwrite it.");
         _;
     }
     
     // @dev Checks if a merchant address is already registered with a particular acquirer
-    modifier isExistingMerchant(address _from, string calldata _hashOfQRDestInfo) {
-        require(_merchantAlreadyExists(_from, _hashOfQRDestInfo),"Error: Merchant does not exist.");
+    modifier registeredMerchant(address _from, string calldata _hashOfQRDestInfo) {
+        require(_merchantAlreadyRegistered(_from, _hashOfQRDestInfo),"Error: Merchant does not exist.");
         _;
     }
 
     // @dev Checks if an organisation name is already registered
-    modifier isExistingOrganisation(string calldata _organisationName) {
-        require(organisationExists(_organisationName),"Error: Organisation does not exist.");
+    modifier registeredOrganisation(string calldata _organisationName) {
+        require(organisationAlreadyRegistered(_organisationName),"Error: Organisation does not exist.");
         _;
     }
 
     // @dev Checks if an organisation name is not already registered
-    modifier notExistingOrganisation(string calldata _organisationName) {
-        require(!organisationExists(_organisationName),"Error: Organisation already exists.");
+    modifier notRegisteredOrganisation(string calldata _organisationName) {
+        require(!organisationAlreadyRegistered(_organisationName),"Error: Organisation already exists.");
         _;
     }
 
@@ -124,6 +125,7 @@ contract QRLookup {
     function addOwner(address _newOwner) 
         public 
         onlyOwner {
+        require(!isOwner(_newOwner),"Error: Owner already exists.");
         _owners.push(_newOwner);
         emit OwnerAdded(_newOwner);
     }
@@ -135,7 +137,8 @@ contract QRLookup {
         onlyOwner {
         //require oldOwner to be in owners array
         require(isOwner(_oldOwner),"Error: Not an owner");
-        require(_owners.length > 1,"Error: Cannot remove last owner");
+        require(_owners.length > 2,"Error: Cannot remove last non-contract owner");
+        require(_oldOwner != address(this),"Error: Cannot remove contract address from owner list."); 
 
         //remove oldOwner from owners array
         for (uint i = 0; i < _owners.length; i++) {
@@ -152,7 +155,7 @@ contract QRLookup {
     function addOrganisationName(string calldata _organisationName) 
         public 
         onlyOwner 
-        notExistingOrganisation(_organisationName){
+        notRegisteredOrganisation(_organisationName){
         _organisationNames.push(_organisationName);
         emit OrganisationAdded(_organisationName);
     }
@@ -162,11 +165,20 @@ contract QRLookup {
     function removeOrganisationName(string calldata _organisationName) 
         public 
         onlyOwner 
-        isExistingOrganisation(_organisationName){
+        registeredOrganisation(_organisationName){
         //require organisationName to be in organisationNames array
         require(_organisationNames.length > 0,"Error: There are no existing organisation names.");
+        
+        // remove all acquirers associated with the organisation to ensure these acquirers are no longer able to register and deregister merchants. There's no need to remove merchant addresses as getMerchantAddress() will check that the hash is associated to a registered organisation name before returning merchant address.
+        for (uint i = 0; i < _acquirers.length; i++) {
+            if (keccak256(abi.encodePacked(_organisation[_acquirers[i]])) == keccak256(abi.encodePacked(_organisationName))) {
+                delete _organisation[_acquirers[i]];
+                delete _acquirers[i];
+                emit AcquirerRemoved(_acquirers[i], _organisationName);
+            }
+        }
 
-        //remove organisationName from organisationNames array
+        // remove organisationName from organisationNames array
         for (uint i = 0; i < _organisationNames.length; i++) {
             if (keccak256(abi.encodePacked(_organisationNames[i])) == keccak256(abi.encodePacked(_organisationName))) {
                 delete _organisationNames[i];
@@ -176,7 +188,7 @@ contract QRLookup {
         }
     }
 
-    function organisationExists(string calldata _organisationName) 
+    function organisationAlreadyRegistered(string calldata _organisationName) 
         public 
         view 
         returns (bool){
@@ -207,7 +219,8 @@ contract QRLookup {
     function addAcquirer(address _newAcquirer, string calldata _organisationName) 
         public 
         onlyOwner 
-        isExistingOrganisation(_organisationName){
+        registeredOrganisation(_organisationName){
+        require(!isAcquirer(_newAcquirer),"Error: Acquirer already exists.");
         _organisation[_newAcquirer] = _organisationName;
         _acquirers.push(_newAcquirer);
         emit AcquirerAdded(_newAcquirer, _organisationName);
@@ -245,68 +258,48 @@ contract QRLookup {
     // @dev Registers a merchant address to a hash of the QR_dest_info and organisation name
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
     // @param _merchantAddress The address of the merchant to be registered
-    function registerQR(string calldata _hashOfQRDestInfo, address _merchantAddress) 
+    function registerMerchantQR(string calldata _hashOfQRDestInfo, address _merchantAddress) 
         public 
         onlyAcquirer 
-        notExistingMerchant(msg.sender, _hashOfQRDestInfo){
+        notRegisteredMerchant(msg.sender, _hashOfQRDestInfo){
         _lookup[_organisation[msg.sender]][_hashOfQRDestInfo] = _merchantAddress;
         emit MerchantRegistered(_organisation[msg.sender], _hashOfQRDestInfo, _merchantAddress);
     }
 
     // @dev Deletes a merchant address from the _lookup mapping
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
-    function deleteQR(string calldata _hashOfQRDestInfo) 
+    function deregisterMerchantQR(string calldata _hashOfQRDestInfo) 
         public 
         onlyAcquirer 
-        isExistingMerchant(msg.sender, _hashOfQRDestInfo){
+        registeredMerchant(msg.sender, _hashOfQRDestInfo){
         address _merchantAddress = _lookup[_organisation[msg.sender]][_hashOfQRDestInfo];
         delete _lookup[_organisation[msg.sender]][_hashOfQRDestInfo];
-        emit MerchantDeleted(_organisation[msg.sender], _hashOfQRDestInfo, _merchantAddress);
+        emit MerchantDeregistered(_organisation[msg.sender], _hashOfQRDestInfo, _merchantAddress);
     }
 
     // @dev Checks if a hash of the QR_dest_info is already registered with an acquirer
     // @param from The address of the acquirer
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
-    function _merchantAlreadyExists(address from, string calldata _hashOfQRDestInfo) 
+    function _merchantAlreadyRegistered(address from, string calldata _hashOfQRDestInfo) 
         internal 
         view 
         returns (bool) {
         return _lookup[_organisation[from]][_hashOfQRDestInfo] != address(0);
     }
 
-    // @dev Gets the merchant address when provided with a hash of the QR_dest_info.
+    // @dev Gets the merchant address when provided with a hash of the QR_dest_info. Alternatively, an offline database can be build using the events emitted to enable gas free search.
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
     function getMerchantAddress(string calldata _hashOfQRDestInfo) 
         public 
         view 
-        returns (address[] memory){
-        address[] memory _merchantAddresses = new address[](1);
-        
+        returns (address){
+        // Search through all organisation names to find the merchant address
         for (uint i = 0; i<_organisationNames.length; i++) {
             if (_lookup[_organisationNames[i]][_hashOfQRDestInfo] != address(0)) {
-                if (_merchantAddresses[0] == address(0)) {
-                    _merchantAddresses[0] = _lookup[_organisationNames[i]][_hashOfQRDestInfo];
-                } else {
-                    _merchantAddresses = _pushAddress(_merchantAddresses,_lookup[_organisationNames[i]][_hashOfQRDestInfo]);
-                }
+                return _lookup[_organisationNames[i]][_hashOfQRDestInfo];
             }
         }
-        return _merchantAddresses;
-    }
-    
-    //Utility functions
-    // @dev Pushes a new address to an array of addresses
-    function _pushAddress(address[] memory array, address newAddress) 
-        internal
-        pure 
-        returns (address[] memory) {
-        address[] memory newArray = new address[](array.length + 1);
-
-        for (uint256 i = 0; i < array.length; i++) {
-            newArray[i] = array[i];
-        }
-        newArray[array.length] = newAddress;
-        return newArray;
+        revert("Error: Merchant is not registered.");
     }
 
 }
