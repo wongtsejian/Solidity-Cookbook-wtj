@@ -161,7 +161,8 @@ contract QRLookup {
     // @param _organisationName The name of the organisation to be removed
     function removeOrganisationName(string calldata _organisationName) 
         public 
-        onlyOwner {
+        onlyOwner 
+        isExistingOrganisation(_organisationName){
         //require organisationName to be in organisationNames array
         require(_organisationNames.length > 0,"Error: There are no existing organisation names.");
 
