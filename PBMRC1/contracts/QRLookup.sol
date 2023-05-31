@@ -259,7 +259,7 @@ contract QRLookup {
 
     // @dev Gets the merchant address when provided with a hash of the QR_dest_info. Alternatively, an offline database can be build using the events emitted to enable gas free search.
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
-    // @return The address of the merchant. If the merchant address is not found, address(0) is returned.
+    // @return The address of the merchant. If the merchant address is not found, reverts that merchant is not registered.
     function getMerchantAddress(string calldata _hashOfQRDestInfo) 
         public 
         view 
