@@ -1,6 +1,6 @@
 /**
 * Copyright CENTRE SECZ 2018
-* Copyright (c) 2020 Xfers Pte. Ltd.
+* Copyright (c) 2023 Xfers Pte. Ltd.
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,6 @@ pragma solidity 0.8.18;
 contract QRLookup {
     
     // Events
-    event OwnerAdded(address indexed owner);
-    event OwnerRemoved(address indexed owner);
     event AcquirerAdded(address indexed acquirer, string organisationName);
     event AcquirerRemoved(address indexed acquirer, string organisationName);
     event MerchantRegistered(string indexed organisationName, string hashOfQRDestInfo, address indexed merchantAddress);
@@ -36,7 +34,7 @@ contract QRLookup {
 
     // State variables
     // array of owners' addresses
-    address[] private _owners;
+    address private _owner;
     // array of whitelisted acquirers' addresses
     address[] private _acquirers;
     // array of whitelisted acquirers' organisation names
@@ -58,8 +56,7 @@ contract QRLookup {
 
     // @dev Constructor
     constructor() {
-        _owners.push(msg.sender);
-        _owners.push(address(this));
+        _owner = msg.sender;
     }
 
     // @dev Checks if a caller is an owner
@@ -98,61 +95,28 @@ contract QRLookup {
         _;
     }
 
-    // @dev Checks if an address is an owner
+    // @dev Checks if an address is the owner
     // @param _owner The address to be checked
-    function isOwner(address _owner) 
+    // @return True if the address is the owner, false otherwise
+    function isOwner(address _from) 
         public 
         view 
         returns (bool){
-        for (uint index = 0; index < _owners.length; index++) {
-            if (_owners[index] == _owner) {
-                return true;
-            }
-        }
-        return false;
+        return _from == _owner;
     }
 
-    // @dev Gets the list of owners
+    // @dev Gets the owner's address
+    // @return The owner's address
     function getOwner() 
         public 
         view 
-        returns (address[] memory) {
-        return _owners;
-    }
-
-    // @dev Adds an owner address to the _owners array
-    // @param _newOwner The address of the owner to be added
-    function addOwner(address _newOwner) 
-        public 
-        onlyOwner {
-        require(!isOwner(_newOwner),"Error: Owner already exists.");
-        _owners.push(_newOwner);
-        emit OwnerAdded(_newOwner);
-    }
-
-    // @dev Removes an owner address from the _owners array
-    // @param _oldOwner The address of the owner to be removed
-    function removeOwner(address _oldOwner) 
-        public 
-        onlyOwner {
-        //require oldOwner to be in owners array
-        require(isOwner(_oldOwner),"Error: Not an owner");
-        require(_owners.length > 2,"Error: Cannot remove last non-contract owner");
-        require(_oldOwner != address(this),"Error: Cannot remove contract address from owner list."); 
-
-        //remove oldOwner from owners array
-        for (uint i = 0; i < _owners.length; i++) {
-            if (_owners[i] == _oldOwner) {
-                delete _owners[i];
-                emit OwnerRemoved(_oldOwner);
-                break;
-            }
-        }
+        returns (address) {
+        return _owner;
     }
 
     // @dev Adds an organisation to the list of organisation names
     // @param _organisationName The name of the organisation to be added
-    function addOrganisationName(string calldata _organisationName) 
+    function addOrganisation(string calldata _organisationName) 
         public 
         onlyOwner 
         notRegisteredOrganisation(_organisationName){
@@ -162,7 +126,7 @@ contract QRLookup {
 
     // @dev Remove an organisation from list of organisation names
     // @param _organisationName The name of the organisation to be removed
-    function removeOrganisationName(string calldata _organisationName) 
+    function removeOrganisation(string calldata _organisationName) 
         public 
         onlyOwner 
         registeredOrganisation(_organisationName){
@@ -182,12 +146,15 @@ contract QRLookup {
         for (uint i = 0; i < _organisationNames.length; i++) {
             if (keccak256(abi.encodePacked(_organisationNames[i])) == keccak256(abi.encodePacked(_organisationName))) {
                 delete _organisationNames[i];
-                emit OrganisationRemoved(_organisationName);
                 break;
             }
         }
+        emit OrganisationRemoved(_organisationName);
     }
 
+    // @dev Checks if an organisation name is already registered
+    // @param _organisationName The name of the organisation to be checked
+    // @return True if the organisation name is already registered, false otherwise
     function organisationAlreadyRegistered(string calldata _organisationName) 
         public 
         view 
@@ -202,6 +169,7 @@ contract QRLookup {
 
     // @dev Checks if an address is an acquirer
     // @param _acquirer The address to be checked
+    // @return True if the address is an acquirer, false otherwise
     function isAcquirer(address _acquirer) 
         public 
         view 
@@ -227,6 +195,7 @@ contract QRLookup {
     }
 
     // @dev Gets the list of whitelisted acquirers
+    // @return The list of whitelisted acquirers
     function getAcquirers() 
         public 
         view 
@@ -280,6 +249,7 @@ contract QRLookup {
     // @dev Checks if a hash of the QR_dest_info is already registered with an acquirer
     // @param from The address of the acquirer
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
+    // @return True if the hash of the QR_dest_info is already registered with an acquirer, false otherwise
     function _merchantAlreadyRegistered(address from, string calldata _hashOfQRDestInfo) 
         internal 
         view 
@@ -289,6 +259,7 @@ contract QRLookup {
 
     // @dev Gets the merchant address when provided with a hash of the QR_dest_info. Alternatively, an offline database can be build using the events emitted to enable gas free search.
     // @param _hashOfQRDestInfo The Keccak256 hash of the QR_dest_info
+    // @return The address of the merchant. If the merchant address is not found, address(0) is returned.
     function getMerchantAddress(string calldata _hashOfQRDestInfo) 
         public 
         view 
