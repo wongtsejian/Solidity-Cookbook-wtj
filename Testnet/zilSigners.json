@@ -1,7 +1,22 @@
 [
-  { "ZilTest1": "zil13ec5wnd7ah5d2q3y46ad2zcd5zh0tqmkeepe9k" },
-  { "ZilTest2": "zil12lhg5mnkm3qg8ky6t4uzn36yfcvqeu4j2hn3jx" },
-  { "ZilTest3": "zil1fg5wxkh9s6ljxq52l54wfds47ea7zz9u9a883t" },
-  { "ZilTest4": "zil1cwhtlwppst6qxza08tvhmk0v2fjqk528xq060j" },
-  { "ZilTest5": "zil1d0545cy09nkcj5nnqscsgf6hncyjvsfhwftqvh" }
+  {
+    "Signer": "ZilTest1",
+    "Address": "zil13ec5wnd7ah5d2q3y46ad2zcd5zh0tqmkeepe9k"
+  },
+  {
+    "Signer": "ZilTest2",
+    "Address": "zil12lhg5mnkm3qg8ky6t4uzn36yfcvqeu4j2hn3jx"
+  },
+  {
+    "Singer": "ZilTest3",
+    "Address": "zil1fg5wxkh9s6ljxq52l54wfds47ea7zz9u9a883t"
+  },
+  {
+    "Signer": "ZilTest4",
+    "Address": "zil1cwhtlwppst6qxza08tvhmk0v2fjqk528xq060j"
+  },
+  {
+    "Signer": "ZilTest5",
+    "Address": "zil1d0545cy09nkcj5nnqscsgf6hncyjvsfhwftqvh"
+  }
 ]
