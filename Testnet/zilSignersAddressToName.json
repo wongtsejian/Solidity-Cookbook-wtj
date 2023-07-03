@@ -1,7 +1,32 @@
 {
-  "zil13ec5wnd7ah5d2q3y46ad2zcd5zh0tqmkeepe9k": "ZilTest1",
-  "zil12lhg5mnkm3qg8ky6t4uzn36yfcvqeu4j2hn3jx": "ZilTest2",
-  "zil1fg5wxkh9s6ljxq52l54wfds47ea7zz9u9a883t": "ZilTest3",
-  "zil1cwhtlwppst6qxza08tvhmk0v2fjqk528xq060j": "ZilTest4",
-  "zil1d0545cy09nkcj5nnqscsgf6hncyjvsfhwftqvh": "ZilTest5"
+  "mainnetXSGD": {
+    "zil17hu7rtvw5epe7cj7z2uw74lpaxdv95ur93qkjc": "Junhao",
+    "zil1u5mpw0receln9tmf6r2p6dm24584wxlea75sfh": "Aymeric",
+    "zil1ljjjkyx3vqze6zldzkrapzzz9edx533q8x3y2h": "Zhikai",
+    "zil1jfpxlxsfhtq6cwcfvag5yaumsy5yxalwrsn3fh": "Victor",
+    "zil155sq5alhu2apjw9dh2wxdk8h0yg698u0ycsafk": "Yuenshe",
+    "zil1fvm9kdt7ax95c0ga2ppmtwc65z9jmy55zpqzc6": "Tianwei",
+    "zil16mtnrll5fd9au57886ewzvtl7hpurxaerpsghj": "Tianyao",
+    "zil152a3vuxk0nwgwvrst2cx2rdu6s42d9elamk3wr": "Sharon",
+    "zil1zy8dez4dasjtu8kq7cdanmk99lnk4p86nh99sn": "Samson",
+    "zil17m77z0ys3z6fhd5398vc7c850adxtq2uw6nzu8": "Ian",
+    "zil19rml2anpzfydprdf547vfvsyzxk8cnxjpl22mw": "Gwenda",
+    "zil1z0p6uuahfj0cvk2xtghhwve65d9t2k32ajdee5": "Jun Chi",
+    "zil1ej8s5eyqjxk44szyctd5yjh78evrnlvcect0yz": "David Jonathan Choo"
+  },
+  "mainnetXIDR": {},
+  "testnetXSGD": {
+    "zil13ec5wnd7ah5d2q3y46ad2zcd5zh0tqmkeepe9k": "ZilTest1",
+    "zil12lhg5mnkm3qg8ky6t4uzn36yfcvqeu4j2hn3jx": "ZilTest2",
+    "zil1fg5wxkh9s6ljxq52l54wfds47ea7zz9u9a883t": "ZilTest3",
+    "zil1cwhtlwppst6qxza08tvhmk0v2fjqk528xq060j": "ZilTest4",
+    "zil1d0545cy09nkcj5nnqscsgf6hncyjvsfhwftqvh": "ZilTest5"
+  },
+  "testnetXIDR": {
+    "zil13ec5wnd7ah5d2q3y46ad2zcd5zh0tqmkeepe9k": "ZilTest1",
+    "zil12lhg5mnkm3qg8ky6t4uzn36yfcvqeu4j2hn3jx": "ZilTest2",
+    "zil1fg5wxkh9s6ljxq52l54wfds47ea7zz9u9a883t": "ZilTest3",
+    "zil1cwhtlwppst6qxza08tvhmk0v2fjqk528xq060j": "ZilTest4",
+    "zil1d0545cy09nkcj5nnqscsgf6hncyjvsfhwftqvh": "ZilTest5"
+  }
 }
